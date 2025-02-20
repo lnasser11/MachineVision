@@ -1,4 +1,4 @@
-# Machine Vision - University Course  
+# Machine Vision - Insper
 
 This repository contains projects, assignments, and notes for my **Machine Vision** course. The topics covered include:  
 
