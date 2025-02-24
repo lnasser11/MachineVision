@@ -10,7 +10,7 @@ This repository contains projects, assignments, and notes for my **Machine Visio
 
 ## 📝 Notes  
 
-- The implementations are written in **Python** using **OpenCV, NumPy,** and other relevant libraries.  
+- The implementations are written in **Python** using **Open CV, NumPy,** and other relevant libraries.  
 - Some assignments might require additional datasets or files, which will be linked in the project folders.  
 
 ## 📜 License  

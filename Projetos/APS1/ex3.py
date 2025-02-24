@@ -1,39 +1,51 @@
-
-
-import cv2
 import numpy as np
-import matplotlib.pyplot as plt
+import cv2
 
-fig_2 = cv2.imread('Figuras/Fig0342a.tif', cv2.IMREAD_GRAYSCALE)
+cap = cv2.VideoCapture('C:\\Users\\lucca\\OneDrive - Insper\\Documentos\\Insper\\6\\VisMaq\\MachineVision\\Projetos\\APS1\\Figuras_APS1\\Video_APS1_3.avi')
 
-m = 3
-d = int((m-1)/2)
+if not cap.isOpened():
+    print("Erro ao abrir o vídeo.")
+    exit()
 
-kernel_x = np.array([ [-1, -1, -1], [0, 0, 0], [1, 1, 1] ], dtype = 'int16')
-kernel_y = np.array([ [-1, 0, 1], [-1, 0, 1], [-1, 0, 1] ], dtype = 'int16')
+num_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+print('Número de frames:', num_frames)
 
-(h, w) = fig_2.shape
+frame_atual = 1
+ret, frame_anterior = cap.read()
 
-fig_out = np.zeros((h, w), dtype = 'uint8')
+frame_anterior_gray = cv2.cvtColor(frame_anterior, cv2.COLOR_BGR2GRAY)
 
-for i in range(d, h-d):
-    for j in range(d, w-d):
+while(frame_atual < num_frames):
+    ret, frame = cap.read()
+    
+    if not ret:
+        print("Não foi possível ler o frame.")
+        break
 
-        fig_section_x = fig_2[i-d:i+d+1, j-d:j+d+1] * kernel_x
-        fig_section_y = fig_2[i-d:i+d+1, j-d:j+d+1] * kernel_y
+    frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-        fig_out[i, j] = abs(np.sum(fig_section_x)) + abs(np.sum(fig_section_y))
+    diff = cv2.absdiff(frame_gray, frame_anterior_gray)
 
-plt.figure(figsize=(10,10))
+    _, thresh = cv2.threshold(diff, 30, 255, cv2.THRESH_BINARY)
 
-plt.subplot(1,2,1)
-plt.imshow(fig_2, cmap='gray')
-plt.title('Original')
-plt.axis('off')
+    contornos = np.where(thresh > 0, 255, 0).astype(np.uint8)
 
-plt.subplot(1,2,2)
-plt.imshow(fig_out, cmap='gray')
-plt.title('Filtrada Final')
-plt.axis('off')
+    scale_percent = 30
+    width = int(frame_gray.shape[1] * scale_percent / 100)
+    height = int(frame_gray.shape[0] * scale_percent / 100)
+    dim = (width, height)
 
-plt.show()
+    resized_gray = cv2.resize(frame_gray, dim, interpolation=cv2.INTER_AREA)
+    resized_contornos = cv2.resize(contornos, dim, interpolation=cv2.INTER_AREA)
+
+    cv2.imshow('Video Cinza', resized_gray)
+    cv2.imshow('Contornos Carros', resized_contornos)
+
+    frame_anterior_gray = frame_gray.copy()
+    frame_atual += 1
+
+    if cv2.waitKey(30) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()
