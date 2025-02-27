@@ -3,8 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Carregar as imagens
-img_1a = cv2.imread('C:\\Users\\lucca\\OneDrive - Insper\\Documentos\\Insper\\6\\VisMaq\\MachineVision\\Projetos\\APS1\\Figuras_APS1\\Fig_APS1_1a.bmp', cv2.IMREAD_COLOR)
-img_1b = cv2.imread('C:\\Users\\lucca\\OneDrive - Insper\\Documentos\\Insper\\6\\VisMaq\\MachineVision\\Projetos\\APS1\\Figuras_APS1\\Fig_APS1_1b.bmp', cv2.IMREAD_COLOR)
+img_1a = cv2.imread('C:\\Users\\lucca\\OneDrive - Insper\\Documentos\\Insper\\6\\VisMaq\\MachineVision\\Projetos\\APS1\\Figuras_APS1\\Fig_APS1_1a.bmp', cv2.IMREAD_GRAYSCALE)
+img_1b = cv2.imread('C:\\Users\\lucca\\OneDrive - Insper\\Documentos\\Insper\\6\\VisMaq\\MachineVision\\Projetos\\APS1\\Figuras_APS1\\Fig_APS1_1b.bmp', cv2.IMREAD_GRAYSCALE)
 
 # Subtrair as imagens
 img1_diff = cv2.subtract(img_1a, img_1b)
@@ -18,12 +18,14 @@ img1_gray = cv2.cvtColor(img1_add, cv2.COLOR_BGR2GRAY)
 
 # Obter dimensões
 (h, w) = img1_gray.shape
+(a, b) = img_1b.shape
+
 print('Height: ', h)
 print('Width = ', w)
 
 # Converter para preto e branco usando um threshold
 img1_bnw = np.zeros((h,w), dtype="uint8")
-threshold = 100
+threshold = 105
 
 for i in range(h):
     for j in range(w):
@@ -32,7 +34,12 @@ for i in range(h):
 
 # Calcular a proporção de pixels pretos
 black = 0
-total = h * w
+total = 0
+
+for i in range(h):
+    for j in range(w):
+        if img1_diff[i, j] > 0:
+            total += 1
 
 for i in range(h):
     for j in range(w):

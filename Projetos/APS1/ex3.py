@@ -3,28 +3,24 @@ import cv2
 
 cap = cv2.VideoCapture('C:\\Users\\lucca\\OneDrive - Insper\\Documentos\\Insper\\6\\VisMaq\\MachineVision\\Projetos\\APS1\\Figuras_APS1\\Video_APS1_3.avi')
 
-if not cap.isOpened():
-    print("Erro ao abrir o vídeo.")
-    exit()
-
 num_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 print('Número de frames:', num_frames)
 
-frame_atual = 1
-ret, frame_anterior = cap.read()
+ret, primeiro_frame = cap.read()
+primeiro_frame_gray = cv2.cvtColor(primeiro_frame, cv2.COLOR_BGR2GRAY)
 
-frame_anterior_gray = cv2.cvtColor(frame_anterior, cv2.COLOR_BGR2GRAY)
+frame_atual = 1
 
 while(frame_atual < num_frames):
     ret, frame = cap.read()
     
     if not ret:
-        print("Não foi possível ler o frame.")
         break
 
     frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-    diff = cv2.absdiff(frame_gray, frame_anterior_gray)
+    diff = frame_gray.astype(np.int32) - primeiro_frame_gray.astype(np.int32)
+    diff = np.abs(diff).astype(np.uint8)
 
     _, thresh = cv2.threshold(diff, 30, 255, cv2.THRESH_BINARY)
 
@@ -33,15 +29,14 @@ while(frame_atual < num_frames):
     scale_percent = 30
     width = int(frame_gray.shape[1] * scale_percent / 100)
     height = int(frame_gray.shape[0] * scale_percent / 100)
-    dim = (width, height)
+    tamanho = (width, height)
 
-    resized_gray = cv2.resize(frame_gray, dim, interpolation=cv2.INTER_AREA)
-    resized_contornos = cv2.resize(contornos, dim, interpolation=cv2.INTER_AREA)
+    resized_carros = cv2.resize(frame, tamanho, interpolation=cv2.INTER_AREA)
+    resized_contornos = cv2.resize(contornos, tamanho, interpolation=cv2.INTER_AREA)
 
-    cv2.imshow('Video Cinza', resized_gray)
+    cv2.imshow('Carros', resized_carros)
     cv2.imshow('Contornos Carros', resized_contornos)
 
-    frame_anterior_gray = frame_gray.copy()
     frame_atual += 1
 
     if cv2.waitKey(30) & 0xFF == ord('q'):
