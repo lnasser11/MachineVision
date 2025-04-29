@@ -11,35 +11,6 @@ persp4 = cv2.imread('Figuras_APS2/Fig4_Campo_Persp4.bmp', cv2.IMREAD_GRAYSCALE)
 import numpy as np
 import cv2
 
-def detect_white_dots_centroid(img):
-    h, w = img.shape
-    visited = np.zeros_like(img, dtype=bool)
-    positions = []
-
-    for v in range(h):
-        for u in range(w):
-            if img[v, u] == 255 and not visited[v, u]:
-                # Iniciar um novo grupo (bolinha)
-                stack = [(u, v)]
-                blob_pixels = []
-
-                while stack:
-                    x, y = stack.pop()
-                    if (0 <= x < w) and (0 <= y < h) and not visited[y, x] and img[y, x] == 255:
-                        visited[y, x] = True
-                        blob_pixels.append((x, y))
-
-                        # Checar os 4 vizinhos
-                        stack.extend([(x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)])
-
-                # Pegar o centro do grupo
-                if blob_pixels:
-                    avg_x = int(np.mean([p[0] for p in blob_pixels]))
-                    avg_y = int(np.mean([p[1] for p in blob_pixels]))
-                    positions.append((avg_x, avg_y))
-
-    return positions
-
 def img_perspective(img, matrix):
     (h, w) = img.shape
 
@@ -73,8 +44,32 @@ def img_perspective(img, matrix):
     img_out_cropped = img_out[10:490, 10:400]
     img_out_color_cropped = img_out_color[10:490, 10:400]
 
-    # Detectar jogadores (agora pegando o centro de cada bolinha)
-    player_positions = detect_white_dots_centroid(img_out_cropped)
+    # Detectar jogadores (pegando o centro de cada bolinha)
+    h_cropped, w_cropped = img_out_cropped.shape
+    visited = np.zeros_like(img_out_cropped, dtype=bool)
+    player_positions = []
+
+    for v in range(h_cropped):
+        for u in range(w_cropped):
+            if img_out_cropped[v, u] == 255 and not visited[v, u]:
+                # Iniciar um novo grupo (bolinha)
+                stack = [(u, v)]
+                blob_pixels = []
+
+                while stack:
+                    x, y = stack.pop()
+                    if (0 <= x < w_cropped) and (0 <= y < h_cropped) and not visited[y, x] and img_out_cropped[y, x] == 255:
+                        visited[y, x] = True
+                        blob_pixels.append((x, y))
+
+                        # Checar os 4 vizinhos
+                        stack.extend([(x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)])
+
+                # Pegar o centro do grupo
+                if blob_pixels:
+                    avg_x = int(np.mean([p[0] for p in blob_pixels]))
+                    avg_y = int(np.mean([p[1] for p in blob_pixels]))
+                    player_positions.append((avg_x, avg_y))
 
     # Contar jogadores à esquerda da linha
     jogadores_a_esquerda = 0
@@ -85,6 +80,7 @@ def img_perspective(img, matrix):
         # Desenhar bolinha azul na imagem, agora **só no centro da bolinha**
         cv2.circle(img_out_color_cropped, (u, v), 6, (255, 0, 0), -1)
 
+
     # Resultado
     if jogadores_a_esquerda >= 2:
         print("Não impedido")
@@ -93,7 +89,7 @@ def img_perspective(img, matrix):
 
     print("\nPosições dos jogadores:", player_positions)
     print("\nJogadores à esquerda da linha:", jogadores_a_esquerda)
-
+    print("\n")
     # Mostrar imagem
     cv2.imshow('Transformed Image with Players', img_out_color_cropped)
     cv2.waitKey(0)
@@ -130,8 +126,7 @@ matriz_ultra_benefica = np.array([[mat_mult[0][0], mat_mult[1][0], mat_mult[2][0
                                   [mat_mult[6][0], mat_mult[7][0], 1]])
 
 
-img_perspective(persp1, matriz_ultra_benefica)
-img_perspective(persp2, matriz_ultra_benefica)
-img_perspective(persp3, matriz_ultra_benefica)
-img_perspective(persp4, matriz_ultra_benefica)
+for contador, img in enumerate([persp1, persp2, persp3, persp4], 1):
+    print(f"imagem {contador}")
+    img_perspective(img, matriz_ultra_benefica)
 

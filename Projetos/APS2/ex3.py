@@ -8,28 +8,7 @@ arm2 = cv2.imread(r"C:\Users\lucca\OneDrive - Insper\Documentos\Insper\6\VisMaq\
 data = np.genfromtxt(r"C:\Users\lucca\OneDrive - Insper\Documentos\Insper\6\VisMaq\MachineVision\Projetos\APS2\Figuras_APS2\Robo_Cinematica.csv", delimiter=';')
 
 def create_robot_arm_visualization(base, arm1, arm2, theta1, theta2):
-    """
-    Creates a visualization of a robot arm by combining base, arm1, and arm2 images
-    with specified rotation angles.
-    
-    Parameters:
-    -----------
-    base : numpy.ndarray
-        The base image of the robot
-    arm1 : numpy.ndarray
-        The first arm segment image
-    arm2 : numpy.ndarray
-        The second arm segment image
-    theta1 : float
-        Rotation angle for arm2 in degrees (default: 0)
-    theta2 : float
-        Rotation angle for the combined arms in degrees (default: 0)
-        
-    Returns:
-    --------
-    numpy.ndarray
-        The combined image with all robot parts
-    """
+
     # Binarize the images using thresholding
     _, base_binary = cv2.threshold(base, 127, 255, cv2.THRESH_BINARY)
     _, arm1_binary = cv2.threshold(arm1, 127, 255, cv2.THRESH_BINARY)
