@@ -18,8 +18,8 @@ def find_best_matches(image, pattern, top_n=3):
     
     match_scores = []
     
-    for y in range(h_img - h_pat):
-        for x in range(w_img - w_pat):
+    for y in range(h_img - h_pat + 1):
+        for x in range(w_img - w_pat + 1):
             region = img_array[y:y+h_pat, x:x+w_pat]
             numerador = np.sum(region * pat_array)
             denominador = (np.sum((region**2))*np.sum((pat_array**2)))**(1/2)
